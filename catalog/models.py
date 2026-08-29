@@ -73,6 +73,11 @@ class Book(models.Model):
     genre = models.ManyToManyField(
         Genre, help_text="Select a genre for this book")
 
+    def display_genre(self):
+        """Create a string for the Genre. This is required to display genre in Admin."""
+        return ', '.join(genre.name for genre in self.genre.all()[:3])
+    display_genre.short_description = 'Genre'
+
     def __str__(self):
         """String for representing the Model object."""
         return self.title
@@ -110,8 +115,8 @@ class BookInstance(models.Model):
 
     def __str__(self):
         """String for representing the Model object."""
-        return f'{self.id} ({self.book.title})'
-
+        return f'{self.book.title}, {self.get_status_display()}, {self.due_back} ({self.id})'
+    
 class Author(models.Model):
     """Model representing an author."""
     first_name = models.CharField(max_length=100)
@@ -125,7 +130,7 @@ class Author(models.Model):
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
         return reverse('author-detail', args=[str(self.id)])
-
+    
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.last_name}, {self.first_name}'
